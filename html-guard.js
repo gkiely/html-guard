@@ -40,7 +40,7 @@
 
 
   guard.isAMatchingTag = (function(){
-    var tags = ['input'];
+    var tags = [ 'br', 'col', 'embed', 'hr', 'img', 'input', 'source'];
     return function(str){
       return !~tags.indexOf(str);
     }
@@ -56,7 +56,7 @@
 
   guard.cachedOpenTags = {};
 
-  guard.matchingTags = function(str){
+  guard.matchTags = function(str){
     var tags = guard.parseTags(str);
     var _this = this;
 
@@ -137,7 +137,7 @@
     str = this.stripTag(str, 'script').trim();
 
     // clog(str);
-    str = this.matchingTags(str);
+    this.matchTags(str);
   };
 
 
