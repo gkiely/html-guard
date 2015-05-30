@@ -145,6 +145,4 @@
   guard.fetch(window.location.href, function(str){
     guard.findErrors(str);
   });
-
-
 })();
