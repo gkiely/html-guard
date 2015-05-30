@@ -1,0 +1,109 @@
+ 
+    Names
+    Stout CSS
+    Amber CSS
+    Minted CSS
+    Manhatten CSS
+    Fight club css
+    CSS Brewery
+    Captain CSS
+    Lumberjack css
+    Monk css
+
+    
+    PPM: Public, Private, Modifier
+    Lime Green CSS
+
+    CSS
+
+  
+
+    What is it?
+    It's a guideline for css.
+
+
+
+    Todo:
+    - Come up with interesting name like elemental.
+
+    Seperate your resuable code and your one-off or page specific code
+
+    Goals
+    ===
+    Obliterate all usage of style tags
+    To reduce the amount of global classes.
+    No more worrying about a unique class name or a class name clashing.
+
+    Details
+    ====
+    Uses Public and private modules.
+
+
+    Public modules: ModuleName
+    Public module children: ModuleName-childName
+    Public Modifiers: -publicModifier
+    
+    Private Modules: _ModuleName
+    Private Children: _child
+
+    Rules:
+    - Maximum of 1 Public Module per dom node
+    - Maximum of 1 private Module per dom node
+    - No style tags
+    - Do not talk about fight club css
+
+    
+    FAQ
+    > When should I use a public modifier and when should I use a private child?
+    If the style you are adding is something you want to reuse or to be public, use public, else use private.
+    
+    > What if I need a modifier for my private child?
+    You don't, give it a different name.
+  
+    > I don't get it, why can't I just put everything in a public module?
+    You can but it will get huge and unruly quickly.
+
+    Using Private modules to store your one-off or page specific styles will keep your public module clean and reusable.
+
+    > I don't get it, why can't I just put everything in a private module?
+    You can, but it would make things hard to re-use.
+    
+    Example html:
+
+    <div class="MyModule -modifier _MyPrivateModule">
+      <div class="MyModule-myElement -modifier _myPrivateElement">
+        <h3 class="Title -lge"></h3>
+        <span class="Text -content"></span>
+      </div>
+    </div>
+
+
+    Example scss:
+
+    MyModule.public.scss
+
+    // ===============
+    // MyModule
+    // ===============
+    .MyModule{}
+
+    // --- modifiers ---
+    .MyModule.-modifier{}
+
+    // --- children ---
+    .MyModule-item{}
+
+    // --- child modifiers ---
+    .MyModule-item.-modifier{}
+
+    
+
+
+
+    MyModule.private.scss
+    ._MyModule{
+    }
+    // --- children ---
+    ._MyModule{
+      ._item{}
+    }
