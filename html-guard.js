@@ -3,10 +3,10 @@
 
   // Handle console
   var clog = (function(){
-    var prefix = "html-guard: ";
+//    var prefix = "html-guard: ";
     var convertArgs = function(args){
       return Array.prototype.slice.call(args);
-    }
+    };
     if(window.console){
       var clog = function(){
         var args = convertArgs(arguments);
@@ -16,7 +16,7 @@
       clog.warn = function(){
         var args = convertArgs(arguments);
         console.warn.apply(console, args);
-      }
+      };
       return clog;
     }
   })();
@@ -37,13 +37,13 @@
     req.open('GET', url, true);
     req.send();
   };
-
+ 
 
   guard.isAMatchingTag = (function(){
     var tags = [ 'br', 'col', 'embed', 'hr', 'img', 'input', 'source'];
     return function(str){
       return !~tags.indexOf(str);
-    }
+    };
   })();
 
   guard.getBody = function(str){
@@ -81,14 +81,16 @@
       if(this.cachedOpenTags[i].length){
         this.cachedOpenTags[i].forEach(function(el){
           guard.error('Unmatched open tag: ' + el.str );
-        })
+        });
       }
     }
   };
-
+   
+   
   guard.error = function(msg){
     clog.warn( (msg || 'error') + '     line: ?' );
   };
+  
 
   guard.parseTags = function(str){
     var re = /<(?:"[^"]*"['"]*|'[^']*'['"]*|[^'">])+>/g,
@@ -96,7 +98,7 @@
         arr = [];
 
     while( (match = re.exec(str)) !== null ){
-      arr.push({str: match[0], index: match.index})
+      arr.push({str: match[0], index: match.index});
     }
 
     arr.forEach(function(el, i){
@@ -117,7 +119,7 @@
       }
     });
     return arr;
-  }
+  };
 
   guard.stripComments = function(str){
     return str.replace(/<!--[\s\S]*?-->/g, '');
