@@ -12,7 +12,6 @@
         var args = convertArgs(arguments);
         console.log.apply(console, args);
       };
-
       clog.warn = function(){
         var args = convertArgs(arguments);
         console.warn.apply(console, args);
