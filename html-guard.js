@@ -20,7 +20,9 @@
     }
   })();
 
-  var guard = {};
+  var guard = {
+    bodyLineNumber: 0
+  };
 
   guard.fetch = function(url, fn){
     var req = new XMLHttpRequest();
@@ -69,7 +71,8 @@
           _this.cachedOpenTags[el.tag].pop();
         }
         else{
-          _this.error('Unmatched closing tag: ' + el.str);
+          _this.error('Unmatched closing tag: ', el);
+          _this.detailedError(el);
         }
       }
     });
@@ -77,34 +80,37 @@
     for(var i in this.cachedOpenTags){
       if(this.cachedOpenTags[i].length){
         this.cachedOpenTags[i].forEach(function(el){
-          guard.error('Unmatched open tag: ' + el.str );
+          _this.error('Unmatched open tag: ', el);
         });
       }
     }
   };
    
-   
-  guard.error = function(msg){
-    clog.warn( (msg || 'error') + '     line: ?' );
+  guard.error = function(msg, el){
+    clog.warn( msg + el.str + '     line number: ' + el.line );
+  };
+
+  guard.storeDetailedError = function(){
+    
+  };
+  guard.detailedError = function(el){
+    var s1 = this.bodyStr.substring(0, el.index).trimLeft();
+    clog(s1 + '%c' + '<' + el.tag + '>', 'background: yellow');
   };
 
   guard.parseTags = function(str){
     var re = /<(?:"[^"]*"['"]*|'[^']*'['"]*|[^'">])+>/g,
-        line = 1,
+        line,
         match,
         matchLine,
         arr = [],
         reLine = /\n/g;
 
-
-    
-
+    // Get the line numbers for each elem.
     while( (match = re.exec(str)) !== null ){
-      while( (matchLine = reLine.exec(str)) !== null && matchLine.index < match.index ){
-       line++; 
-      }
-      clog(line);
-      arr.push({str: match[0], index: match.index});
+      line = this.getLineNumberFromIndex(match.index, str) + this.bodyLineNumber  - 1; 
+      // clog(line);
+      arr.push({str: match[0], index: match.index, line: line});
     }
 
     arr.forEach(function(el, i){
@@ -112,7 +118,6 @@
           openTag,
           match;
       if(closingTag){
-
         el.tag = closingTag[0].replace('</', '').replace('>', '');
         el.open = false;
       }
@@ -136,21 +141,34 @@
     return html.replace(new RegExp("<" + tagName + "[^>]*>([\\s\\S]*)</" + tagName + ">", "g"), "");
   };
 
-  guard.getLineNumber = function(reg){
-    // reg.exec()
+  /**
+   * function for getting line number
+   */
+  guard.getLineNumber = function(reg, str){
+    var index = this.getIndex(reg, str);
+    return this.getLineNumberFromIndex(index, str);
   };
 
+  guard.getIndex = function(reg, str){
+    var match = reg.exec(str);
+    return match.index
+  };
 
+  guard.getLineNumberFromIndex = function(i, str){
+    var matchLine,
+        regLine = /\n/g,
+        line = 1;
 
+    while( (matchLine = regLine.exec(str)) !== null && matchLine.index < i){
+      line++;
+    }
+    return line;
+  };
 
   // Main error finding function
   guard.findErrors = function(str){
-    var origStr = str;
-    var bodyLineNumber = this.getLineNumber(/<body>/);
-
-
-    str = this.getBody(str);
-
+    this.bodyLineNumber = this.getLineNumber(/<body[^>]*>/, str);
+    str = this.bodyStr = this.getBody(str);
     str = this.stripComments(str);
     str = this.stripTag(str, 'script');
 
@@ -161,6 +179,8 @@
 
   // Initialize
   guard.fetch(window.location.href, function(str){
+    guard.str = str;
     guard.findErrors(str);
+    // guard.detailedErrors();
   });
 })();
