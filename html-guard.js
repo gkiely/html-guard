@@ -3,7 +3,7 @@
 
   // Handle console
   var clog = (function(){
-//    var prefix = "html-guard: ";
+   // var prefix = "html-guard: ";
     var convertArgs = function(args){
       return Array.prototype.slice.call(args);
     };
@@ -46,15 +46,13 @@
   })();
 
   guard.getBody = function(str){
-    // var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-    // var matches = pattern.exec(html);
-    // clog(matches);
     return str.split(/(<body>|<\/body>)/ig)[2];
-
   };
 
   guard.cachedOpenTags = {};
 
+
+  // Matched tags main function
   guard.matchTags = function(str){
     var tags = guard.parseTags(str);
     var _this = this;
@@ -89,14 +87,23 @@
   guard.error = function(msg){
     clog.warn( (msg || 'error') + '     line: ?' );
   };
-  
 
   guard.parseTags = function(str){
     var re = /<(?:"[^"]*"['"]*|'[^']*'['"]*|[^'">])+>/g,
+        line = 1,
         match,
-        arr = [];
+        matchLine,
+        arr = [],
+        reLine = /\n/g;
+
+
+    
 
     while( (match = re.exec(str)) !== null ){
+      while( (matchLine = reLine.exec(str)) !== null && matchLine.index < match.index ){
+       line++; 
+      }
+      clog(line);
       arr.push({str: match[0], index: match.index});
     }
 
@@ -105,6 +112,7 @@
           openTag,
           match;
       if(closingTag){
+
         el.tag = closingTag[0].replace('</', '').replace('>', '');
         el.open = false;
       }
@@ -128,14 +136,23 @@
     return html.replace(new RegExp("<" + tagName + "[^>]*>([\\s\\S]*)</" + tagName + ">", "g"), "");
   };
 
+  guard.getLineNumber = function(reg){
+    // reg.exec()
+  };
+
 
 
 
   // Main error finding function
   guard.findErrors = function(str){
+    var origStr = str;
+    var bodyLineNumber = this.getLineNumber(/<body>/);
+
+
     str = this.getBody(str);
+
     str = this.stripComments(str);
-    str = this.stripTag(str, 'script').trim();
+    str = this.stripTag(str, 'script');
 
     // clog(str);
     this.matchTags(str);
