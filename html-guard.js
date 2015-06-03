@@ -72,7 +72,7 @@
         }
         else{
           _this.error('Unmatched closing tag: ', el);
-          _this.detailedError(el);
+          // _this.detailedError(el);
         }
       }
     });
